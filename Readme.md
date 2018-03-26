@@ -36,6 +36,8 @@ Such a representation can be used in an Adaboost model.
 
 It is also possible to create a simple decision tree. While less precise, you can visualize it graphically
 
+## Draft
+Draft is proof of concept folder meant to be reviewed by Quentin Ferré.
 
 # Git
 Make it a git bitbucket or a git renater maybe.

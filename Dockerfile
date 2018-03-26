@@ -48,4 +48,6 @@ RUN python3 -c "import tensorflow; print(tensorflow.__version__)" \
  && dpkg-query -l > /dpkg-query-l.txt \
  && pip3 freeze > /pip3-freeze.txt
 
-WORKDIR /srv/
+RUN pip3 install pandas
+
+WORKDIR /tagc-predaction/
