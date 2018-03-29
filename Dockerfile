@@ -50,6 +50,8 @@ RUN python3 -c "import tensorflow; print(tensorflow.__version__)" \
 
 RUN pip3 install pandas
 RUN pip3 install multiprocessing_on_dill
+RUN pip3 install matplotlib
+RUN pip3 install seaborn
 
 ENV PYTHONPATH=/tagc-predaction/src
 WORKDIR /tagc-predaction/
