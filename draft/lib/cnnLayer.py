@@ -4,18 +4,24 @@ from keras.layers import Embedding, Flatten
 from keras.layers import Conv2D, MaxPooling2D, LSTM
 from keras import regularizers
 
+import matplotlib as plt
+import seaborn as sns
 
 
 
 def computeFiltersForLayerCnn(model,
-                            selected_layer
+                            selected_layer,
+                            nb_filters
                             ):
     """
     Returns, for a given layer, a list containing a representation of all
     the learned filters and their weight for the classes
     """
     w = model.layers[selected_layer].get_weights()[0][:,:,0,:]
-
+    for i in np.arange(1,nb_filters+1):
+        plt.subplot(int(nb_filters/2),int(nb_filters/2)+1,i)
+        sns.heatmap(w[:,:,i-1], cmap='Greens')
+    plt.show()
 
 def createConvoLayer(window_size,nb_lines,nb_classes,
                       nb_filters_firstlayer = 250, kernel_size = 20,
