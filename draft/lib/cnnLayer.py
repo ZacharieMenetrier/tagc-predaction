@@ -6,6 +6,17 @@ from keras import regularizers
 
 
 
+
+def computeFiltersForLayerCnn(model,
+                            selected_layer
+                            ):
+    """
+    Returns, for a given layer, a list containing a representation of all
+    the learned filters and their weight for the classes
+    """
+    w = model.layers[selected_layer].get_weights()[0][:,:,0,:]
+
+
 def createConvoLayer(window_size,nb_lines,nb_classes,
                       nb_filters_firstlayer = 250, kernel_size = 20,
                       hidden_dims = 120,reg_coef_filter=0,reg_coef_dense=0):
