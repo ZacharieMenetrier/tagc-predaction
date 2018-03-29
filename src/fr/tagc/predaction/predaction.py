@@ -8,6 +8,7 @@ from keras.layers import Conv2D
 from keras.layers import Input
 from keras.layers import Dense
 from keras.models import Model
+from keras import regularizers
 from numpy import fromiter
 from numpy import array
 from numpy import matrix
@@ -21,7 +22,8 @@ def create_model(max_len):
     inputs1, branch1 = create_branch(max_len)
     inputs2, branch2 = create_branch(max_len)
     merge = concatenate([branch1, branch2])
-    predictions = Dense(2, activation="softmax")(merge)
+    intermediate = Dense(12, activation="relu")(merge)
+    predictions = Dense(2, activation="softmax")(intermediate)
     model = Model(inputs=[inputs1, inputs2], outputs=predictions)
     model.compile(optimizer="rmsprop",
                   loss="binary_crossentropy",
@@ -31,9 +33,11 @@ def create_model(max_len):
 
 def create_branch(max_len):
     inputs = Input(shape=(max_len, 21, 1,))
-    conv = Conv2D(5, (21,21))(inputs)
-    flat = Flatten()(conv)
-    branch = Dense(64, activation="relu")(flat)
+    conv = Conv2D(5, (21, 21), activation="relu", padding="same",
+                  kernel_regularizer=regularizers.l2(0.1),)(inputs)
+    pool = MaxPooling2D(pool_size = (1,2))(conv)
+    flat = Flatten()(pool)
+    branch = Dense(20, activation="relu", activity_regularizer=regularizers.l2(0.1))(flat)
     return inputs, branch
 
 
