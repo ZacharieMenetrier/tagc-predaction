@@ -1,0 +1,5 @@
+protA	protB	interaction
+A	B	YES
+C	D	YES
+A	C	NO
+B	D	NO

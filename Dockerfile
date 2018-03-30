@@ -52,6 +52,8 @@ RUN pip3 install pandas
 RUN pip3 install multiprocessing_on_dill
 RUN pip3 install matplotlib
 RUN pip3 install seaborn
+RUN pip3 install tkinter
+
 
 ENV PYTHONPATH=/tagc-predaction/src
 WORKDIR /tagc-predaction/

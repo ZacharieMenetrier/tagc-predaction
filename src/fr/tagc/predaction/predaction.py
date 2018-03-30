@@ -1,7 +1,11 @@
-from fr.tagc.predaction.sequence import get_matrices
-from fr.tagc.predaction.sequence import get_sequences
+from fr.tagc.predaction.visualizer import visualize_filters
+from fr.tagc.predaction.features import get_matrices
+from fr.tagc.predaction.features import get_sequences
 from multiprocessing_on_dill import Pool
 from keras.utils import to_categorical
+from keras.optimizers import SGD
+from keras.layers import MaxPooling2D
+from keras.layers import GlobalMaxPooling2D
 from keras.layers import concatenate
 from keras.layers import Flatten
 from keras.layers import Conv2D
@@ -9,13 +13,14 @@ from keras.layers import Input
 from keras.layers import Dense
 from keras.models import Model
 from keras import regularizers
-from numpy import fromiter
-from numpy import array
-from numpy import matrix
-from numpy import stack
-from numpy import swapaxes
 from numpy import expand_dims
+from numpy import swapaxes
+from numpy import fromiter
+from numpy import matrix
+from numpy import array
+from numpy import stack
 import pandas
+import numpy
 
 
 def create_model(max_len):
@@ -25,24 +30,26 @@ def create_model(max_len):
     intermediate = Dense(12, activation="relu")(merge)
     predictions = Dense(2, activation="softmax")(intermediate)
     model = Model(inputs=[inputs1, inputs2], outputs=predictions)
-    model.compile(optimizer="rmsprop",
+    sgd = SGD(lr=0.01, clipnorm=0.1)
+    model.compile(optimizer=sgd,
                   loss="binary_crossentropy",
                   metrics=["accuracy"])
     return model
 
 
 def create_branch(max_len):
-    inputs = Input(shape=(max_len, 21, 1,))
-    conv = Conv2D(5, (21, 21), activation="relu", padding="same",
-                  kernel_regularizer=regularizers.l2(0.1),)(inputs)
-    pool = MaxPooling2D(pool_size = (1,2))(conv)
-    flat = Flatten()(pool)
-    branch = Dense(20, activation="relu", activity_regularizer=regularizers.l2(0.1))(flat)
+    reg = regularizers.l2(0.01)
+    inputs = Input(shape=(None, 7, 1,))
+    conv = Conv2D(20, (8, 7), activation="relu", kernel_regularizer=reg)(inputs)
+    pool = MaxPooling2D(pool_size = (2,1))(conv)
+    pool = GlobalMaxPooling2D()(pool)
+    # flat = Flatten()(conv)
+    branch = Dense(20, activation="relu", activity_regularizer=reg)(pool)
     return inputs, branch
 
 
-def get_arrays(pairs, sequences, fmap=map):
-    matrices = get_matrices(sequences, fmap=fmap)
+def get_arrays(pairs, sequences, extend=True, fmap=map):
+    matrices = get_matrices(sequences, extend, fmap)
     array1 = [matrices[row.protA] for row in pairs.itertuples()]
     array2 = [matrices[row.protB] for row in pairs.itertuples()]
     return array1, array2
@@ -74,13 +81,18 @@ def read_data_frame(file_path):
 if __name__ == "__main__":
     import sys
     p = Pool(7)
-    pairs, categories, proteins = read_data_frame("data/interaction.tsv")
-    sequences = get_sequences("data/sequences.fasta", proteins)
-    array1, array2 = get_arrays(pairs, sequences, p.map)
-    generator = uncompress_matrices(array1, array2, categories, 100)
+    pairs, categories, proteins = read_data_frame("data/trivial_data.tsv")
+    labels = numpy.array(numpy.argmax(categories, axis=1))
+    sequences = get_sequences("data/small_sequences.fasta", proteins)
+    array1, array2 = get_arrays(pairs, sequences, False, p.map)
+    generator = uncompress_matrices(array1, array2, categories, 1)
     max_len = len(max(sequences.values(), key=len))
-    for g, c in generator:
-        print(g[0].shape, c.shape)
-        break
     model = create_model(max_len)
-    model.fit_generator(generator, steps_per_epoch=100, epochs=100)
+    visualize_filters(model, 2, 20, "results/filters/init1.png", "Reds")
+    visualize_filters(model, 3, 20, "results/filters/init2.png", "Reds")
+    model.fit_generator(generator, steps_per_epoch=100, epochs=10)
+    visualize_filters(model, 2, 20, "results/filters/fit1.png", "Greens")
+    visualize_filters(model, 3, 20, "results/filters/fit2.png", "Greens")
+    preds = model.predict_generator(generator, steps=len(pairs))
+    preds = numpy.array(numpy.argmax(preds, axis = 1))
+    print(pandas.crosstab(preds, labels))
