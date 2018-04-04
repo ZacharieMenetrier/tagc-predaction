@@ -31,6 +31,10 @@ def get_sequences(file_path, includes=None):
     return sequences
 
 
+def tokenize_sequence(sequence):
+    
+
+
 def get_matrices(sequences, extend=True, fmap=map):
     """
     Return a dictionary of sequence matrices for each entry of the sequences
