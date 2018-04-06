@@ -12,10 +12,6 @@ import math
 
 
 def visualize_filters(model, selected_layer, nb_filters, output, cmap="Greens"):
-    """
-    Returns, for a given layer, a list containing a representation of all
-    the learned filters.
-    """
     w = model.layers[selected_layer].get_weights()[0][:,:,0,:]
     for i in np.arange(0, nb_filters):
         n = math.ceil(math.sqrt(nb_filters))
