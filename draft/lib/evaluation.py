@@ -25,10 +25,10 @@ def plotLearningCurve(estimator, title, X, y, ylim=None, cv=None,
     Adapted from scikit-learn.org.
 
     ARGUMENTS
-    estimator : object type that implements the "fit" and "predict" methods
-    title : string for title
-    X : training vector
-    y : target relative to X
+        estimator : object type that implements the "fit" and "predict" methods
+        title : string for title
+        X : training vector
+        y : target relative to X
     """
     plt.figure()
     plt.title(title)
@@ -62,7 +62,9 @@ def plotLearningCurve(estimator, title, X, y, ylim=None, cv=None,
 
 def performGridSearch(estimator, parameters_grid, X_train, y_train, scorer=None, verbose = 0):
     """
-    Performs Grid search and returns the best estimations for the parameters
+    Performs Grid search and returns the best estimations for the parameters.
+
+    This is mainly a wrapper for the sklearn function GridSearchCV
 
     ARGUMENTS
     estimator = an estimator, to be used
@@ -91,7 +93,10 @@ def performGridSearch(estimator, parameters_grid, X_train, y_train, scorer=None,
 def visualizeContingencyTableCertitude(X,y,model,cert_mini, labels=None):
     """Given X, y and a DNN model, will predict X with this model
     and draw a contingency table of the predictions against the given y
-    with respect to the provided certitude (0 to 1)"""
+    with respect to the provided certitude (0 to 1)
+
+    Warning : X and Y mut be of the output format of a multiclass DNN, that is
+    to say a vector of activations for the output neurons"""
     a = pd.Series(dataProcessing.multiClassIntoNumeric(model.predict(X), certitude = cert_mini)).fillna('UNDEFINED')
     foo = pd.Categorical(a, set(a))
     bar = pd.Categorical(y, labels)
@@ -106,8 +111,9 @@ def visualizeContingencyTableCertitude(X,y,model,cert_mini, labels=None):
 def whoWasMisclassified(y_true, y_pred,
                         true_status, selected_mistake):
     """
-    Given y_true (must be a pandas Series) and y_pred, will return the IDs of the examples.
-    of true_status tha were mistakenly identified as belonging to the class selected_mistake
+    Given y_true (must be a pandas Series) and y_pred, will return the IDs of
+    the examples of true_status that were mistakenly identified as belonging
+    to the class selected_mistake.
     """
     y_pred = pd.Series(y_pred)  # Conversion of y_pred into a Series
     pairwise_comparison = [t == true_status and p == selected_mistake for t, p in zip(y_true,y_pred)]
