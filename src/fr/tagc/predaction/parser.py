@@ -1,5 +1,6 @@
-from pandas import read_csv
 from keras.utils import to_categorical
+from pandas import read_csv
+
 
 
 def get_sequences(file_path, includes=None):
@@ -25,6 +26,27 @@ def get_sequences(file_path, includes=None):
                 protein = line.replace(">", "").strip()
             else:
                 sequence += line.strip()
+    if includes:
+        sequences = {protein : sequences[protein] for protein in includes}
+    return sequences
+
+
+
+def get_sequences_from_tsv(file_path, includes=None):
+    """
+    Return a dictionary of sequences with protein names as keys.
+    The input file must be in the FASTA format.
+    The includes parameter may be a list of proteins to keep.
+    If None all the proteins found are returned.
+    """
+    sequences = {}
+    protein = False
+    sequence = ""
+    with open(file_path, "r") as file:
+        lines = file.readlines()
+        for line in lines:
+            line = line.strip().split("\t")
+            sequences[line[0]] = line[1]
     if includes:
         sequences = {protein : sequences[protein] for protein in includes}
     return sequences
