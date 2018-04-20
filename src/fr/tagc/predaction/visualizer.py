@@ -12,9 +12,9 @@ import math
 
 
 def visualize_filters(model, selected_layer, nb_filters, output, cmap="Greens"):
-    w = model.layers[selected_layer].get_weights()[0][:,:,0,:]
+    w = model.layers[selected_layer].get_weights()[0]
     for i in np.arange(0, nb_filters):
         n = math.ceil(math.sqrt(nb_filters))
         plt.subplot(n, n, i + 1)
-        sns.heatmap(w[:,:,i], cmap=cmap, cbar=False, yticklabels=False, xticklabels=False)
+        sns.heatmap(w[:,i], cmap=cmap, cbar=False, yticklabels=False, xticklabels=False)
     plt.savefig(output)

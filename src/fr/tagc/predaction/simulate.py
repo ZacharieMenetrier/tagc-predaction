@@ -15,6 +15,7 @@ def get_simulate_sample(sequence_size, patch_size, trans_function):
         seqA = random_sequence(aa_list, sequence_size)
         seqB = random_sequence(aa_list, sequence_size)
         if category == 1:
+            # amino_acids = ["A", "A"]
             amino_acids = sample(aa_list, 1) * 2
         else:
             amino_acids = sample(aa_list, 2)
