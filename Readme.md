@@ -1,6 +1,6 @@
-This repository contains draft code for the *tagc-predaction* tool.
+# Introduction
 
-The main principle behind this tool is to predict whether a mutation will have an impact on a protein's interaction with another.
+The main principle behind this tool is to predict whether a mutation will have an impact on a protein's interaction with another. It will mainly use deep learning approaches.
 
 To do so, we encode each protein in a supervised manner to increase the relative weight of the mutations.
 
